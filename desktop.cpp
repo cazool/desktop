@@ -10,7 +10,6 @@ Desktop::Desktop(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   // this->setStyleSheet(QString::fromUtf8("background-color: rgb(85, 85, 127);"));
 
     initDesktopWidget();
 
@@ -55,6 +54,7 @@ void Desktop::initDesktopWidget()
     size = 17;
 
 
+    // todo: cashed;
 
     for( int i = 0; appCount < size; i++)
     {
