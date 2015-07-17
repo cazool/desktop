@@ -24,7 +24,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QDateTime>
-
+#include <QStandardPaths>
 
 
 #include <sys/types.h>
@@ -34,7 +34,7 @@
 #include <time.h>
 #include <unistd.h>
 
-//#define qDebug() qDebug() << __FILE__ << __LINE__
+#define XDebug() qDebug() << __FILE__ << __LINE__
 
 
 

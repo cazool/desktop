@@ -1,8 +1,13 @@
+#include <QStandardPaths>
+
 #include "desktop.h"
 #include "setapp.h"
 
 #include "ui_desktop.h"
 #include "globalkeyboardevent.h"
+
+
+
 
 Desktop::Desktop(QWidget *parent) :
     QWidget(parent),
@@ -36,7 +41,10 @@ void Desktop::globelKeyboardEvent()
 
 void Desktop::initDesktopWidget()
 {
-    QDir appDir(qgetenv("HOME") + "/桌面/");
+
+    QString desktopPath = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation).at(0);
+
+    QDir appDir(desktopPath);
     if (!appDir.exists())
         qDebug() << "Cannot find the desktop directory";
 
