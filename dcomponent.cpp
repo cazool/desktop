@@ -3,11 +3,11 @@
 
 DComponent::DComponent()
 {
-    hovered = false;
-    pressed = false;
-    backgroundEnabled = false;
+    m_hovered = false;
+    m_pressed = false;
+    m_backgroundEnabled = false;
     m_isDraggable = false;
-    adjust = 0;
+    m_adjust = 0;
     m_xPos = 0;
     m_yPos = 0;
     setFlag(QGraphicsItem::ItemIsFocusable);
@@ -21,74 +21,74 @@ DComponent::DComponent()
 
 QRectF DComponent::boundingRect() const
 {
-    return QRectF(x_axis - adjust,
-                  y_axis - adjust,
-                  width + adjust,
-                  height + adjust);
+    return QRectF(m_x_axis - m_adjust,
+                  m_y_axis - m_adjust,
+                  m_width + m_adjust,
+                  m_height + m_adjust);
 }
 
 void DComponent::paint(QPainter *painter,const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    if(pressed)
+    if(m_pressed)
     {
-        if(backgroundEnabled)
+        if(m_backgroundEnabled)
         {
-            painter->setPen(pressBackgroundColor);
-            painter->setBrush(pressBackgroundColor);
-            painter->drawRect(x_axis, y_axis, width, height);
+            painter->setPen(m_pressBackgroundColor);
+            painter->setBrush(m_pressBackgroundColor);
+            painter->drawRect(m_x_axis, m_y_axis, m_width, m_height);
         }
-        painter->drawPixmap(-releaseImage.width()/2,-releaseImage.height()/2,
-                            releaseImage.width(),releaseImage.height(),pressImage);
+        painter->drawPixmap(-m_releaseImage.width()/2,-m_releaseImage.height()/2,
+                            m_releaseImage.width(),m_releaseImage.height(),m_pressImage);
 
     }
-    else if(hovered)
+    else if(m_hovered)
     {
-        if(backgroundEnabled)
+        if(m_backgroundEnabled)
         {
-            painter->setPen(hoverBackgroundColor);
-            painter->setBrush(hoverBackgroundColor);
-            painter->drawRect(x_axis, y_axis, width, height);
+            painter->setPen(m_hoverBackgroundColor);
+            painter->setBrush(m_hoverBackgroundColor);
+            painter->drawRect(m_x_axis, m_y_axis, m_width, m_height);
         }
-        painter->drawPixmap(-releaseImage.width()/2,-releaseImage.height()/2,
-                            releaseImage.width(),releaseImage.height(),hoverImage);
+        painter->drawPixmap(-m_releaseImage.width()/2, -m_releaseImage.height()/2,
+                            m_releaseImage.width(), m_releaseImage.height(), m_hoverImage);
     }
     else
     {
-        if(backgroundEnabled)
+        if(m_backgroundEnabled)
         {
-            painter->setPen(releaseBackgroundColor);
-            painter->setBrush(releaseBackgroundColor);
-            painter->drawRect(x_axis, y_axis, width, height);
+            painter->setPen(m_releaseBackgroundColor);
+            painter->setBrush(m_releaseBackgroundColor);
+            painter->drawRect(m_x_axis, m_y_axis, m_width, m_height);
         }
-        painter->drawPixmap(-releaseImage.width()/2,-releaseImage.height()/2,
-                            releaseImage.width(),releaseImage.height(),releaseImage);
+        painter->drawPixmap(-m_releaseImage.width()/2,-m_releaseImage.height()/2,
+                            m_releaseImage.width(),m_releaseImage.height(),m_releaseImage);
     }
 }
 
 void DComponent::boundImageToPress(QString imagePath)
 {
-    pressImage.load(imagePath);
-    if(pressImage.width()>width||pressImage.height()>height)
-        pressImage = pressImage.scaled(width - MARGIN_IMAGE_BOUND,
-                                       height - MARGIN_IMAGE_BOUND,  Qt::KeepAspectRatio);
+    m_pressImage.load(imagePath);
+    if(m_pressImage.width() > m_width || m_pressImage.height() > m_height)
+        m_pressImage = m_pressImage.scaled(m_width - MARGIN_IMAGE_BOUND,
+                                       m_height - MARGIN_IMAGE_BOUND,  Qt::KeepAspectRatio);
 }
 
 void DComponent::boundImageToRelease(QString imagePath)
 {
-    releaseImage.load(imagePath);
-    if(releaseImage.width()>width||releaseImage.height()>height)
-        releaseImage = releaseImage.scaled(width - MARGIN_IMAGE_BOUND,
-                                           height - MARGIN_IMAGE_BOUND,  Qt::KeepAspectRatio);
+    m_releaseImage.load(imagePath);
+    if(m_releaseImage.width() > m_width || m_releaseImage.height() > m_height)
+        m_releaseImage = m_releaseImage.scaled(m_width - MARGIN_IMAGE_BOUND,
+                                           m_height - MARGIN_IMAGE_BOUND,  Qt::KeepAspectRatio);
 }
 
 void DComponent::boundImageToHover(QString imagePath)
 {
-    hoverImage.load(imagePath);
-    if(hoverImage.width()>width||hoverImage.height()>height)
-        hoverImage = hoverImage.scaled(width - MARGIN_IMAGE_BOUND,
-                                       height - MARGIN_IMAGE_BOUND,  Qt::KeepAspectRatio);
+    m_hoverImage.load(imagePath);
+    if(m_hoverImage.width() > m_width||m_hoverImage.height() > m_height)
+        m_hoverImage = m_hoverImage.scaled(m_width - MARGIN_IMAGE_BOUND,
+                                       m_height - MARGIN_IMAGE_BOUND,  Qt::KeepAspectRatio);
 }
 
 void DComponent::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -98,14 +98,14 @@ void DComponent::mousePressEvent(QGraphicsSceneMouseEvent *event)
         m_xPress = event->pos().x();
         m_yPress = event->pos().y();
     }
-    pressed = true;
+    m_pressed = true;
     emit clicked();
     update();
 }
 
 void DComponent::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(pressed&&m_isDraggable)
+    if(m_pressed&&m_isDraggable)
     {
         m_xOffset = event->pos().x() - m_xPress;
         m_xPos += m_xOffset;
@@ -122,7 +122,7 @@ void DComponent::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void DComponent::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event);
-    pressed = false;
+    m_pressed = false;
     update();
 }
 
@@ -134,14 +134,14 @@ void DComponent::keyPressEvent(QKeyEvent *event)
 void DComponent::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     Q_UNUSED(event);
-    hovered = true;
+    m_hovered = true;
     update();
 }
 
 void DComponent::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     Q_UNUSED(event);
-    hovered = false;
+    m_hovered = false;
     update();
 }
 
@@ -157,25 +157,25 @@ void DComponent::setDraggable(bool b)
 
 void DComponent::setBounds(int x, int y, int w, int h)
 {
-    x_axis = x;
-    y_axis = y;
-    width = w;
-    height = h;
+    m_x_axis = x;
+    m_y_axis = y;
+    m_width = w;
+    m_height = h;
 }
 
 void DComponent::setPressBackgroundColor(const QColor &color)
 {
-    pressBackgroundColor = color;
+    m_pressBackgroundColor = color;
 }
 
 void DComponent::setReleaseBackgroundColor(const QColor &color)
 {
-    releaseBackgroundColor = color;
+   m_releaseBackgroundColor = color;
 }
 
 void DComponent::setHoverBackgroundColor(const QColor &color)
 {
-    hoverBackgroundColor = color;
+    m_hoverBackgroundColor = color;
 }
 
 void DComponent::setHoverEnableFlag(bool flag)
@@ -185,75 +185,75 @@ void DComponent::setHoverEnableFlag(bool flag)
 
 void DComponent::setAdjust(qreal value)
 {
-    adjust = value;
+    m_adjust = value;
 }
 
 bool DComponent::isPressed()
 {
-    return pressed;
+    return m_pressed;
 }
 
 bool DComponent::isHovered()
 {
-    return hovered;
+    return m_hovered;
 }
 
 void DComponent::setBackgroundEnable(bool flag)
 {
-    backgroundEnabled = flag;
+    m_backgroundEnabled = flag;
 }
 
 int DComponent::boundX()
 {
-    return x_axis;
+    return m_x_axis;
 }
 
 int DComponent::boundY()
 {
-    return y_axis;
+    return m_y_axis;
 }
 
 int DComponent::boundWidth()
 {
-    return width;
+    return m_width;
 }
 
 int DComponent::boundHeight()
 {
-    return height;
+    return m_height;
 }
 
 void DComponent::setText(const QString & text)
 {
-    textContent = text;
+    m_textContent = text;
 }
 
 QString DComponent::text()
 {
-    return textContent;
+    return m_textContent;
 }
 
 void DComponent::setTextColor(const QColor &color)
 {
-    textColor = color;
+    m_textColor = color;
 }
 
 QColor DComponent::getTextColor()
 {
-    return textColor;
+    return m_textColor;
 }
 
 void DComponent::setBackgroundColor(const QColor &color)
 {
-    backGroundColor = color;
+    m_backGroundColor = color;
 }
 
 QColor DComponent::getBackgroundColor()
 {
-    return backGroundColor;
+    return m_backGroundColor;
 }
 
 void DComponent::setPress(bool b)
 {
-    pressed = b;
+    m_pressed = b;
 }

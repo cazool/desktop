@@ -8,6 +8,8 @@
 class DComponent :  public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES ( QGraphicsItem )
+
 public:
     DComponent();
 
@@ -19,25 +21,51 @@ public:
     void boundImageToHover(QString imagePath);
     void setDraggable(bool b);
 
-    bool pressed;
-    bool hovered;
-    bool backgroundEnabled;
+    bool m_pressed;
+    bool m_hovered;
+    bool m_backgroundEnabled;
 
-    QColor hoverBackgroundColor;
-    QColor releaseBackgroundColor;
-    QColor pressBackgroundColor;
+    QColor m_hoverBackgroundColor;
+    QColor m_releaseBackgroundColor;
+    QColor m_pressBackgroundColor;
 
-    QColor textColor;
-    QColor backGroundColor;
+    QColor m_textColor;
+    QColor m_backGroundColor;
 
-    int x_axis, y_axis, width, height;
-    int text_x, text_y;
-    qreal adjust;
-    QPixmap pressImage;
-    QPixmap releaseImage;
-    QPixmap hoverImage;
+    int m_x_axis;
+    int m_y_axis;
+    int m_width;
+    int m_height;
+    int m_text_x;
+    int m_text_y;
+    qreal m_adjust;
+    QPixmap m_pressImage;
+    QPixmap m_releaseImage;
+    QPixmap m_hoverImage;
 
-    QString textContent;
+    QString m_textContent;
+
+
+    void setBounds(int x, int y, int w, int h);
+    void setPressBackgroundColor(const QColor &color);
+    void setReleaseBackgroundColor(const QColor &color);
+    void setHoverBackgroundColor(const QColor &color);
+    void setHoverEnableFlag(bool flag);
+    void setAdjust(qreal value);
+    bool isPressed();
+    bool isHovered();
+    void setBackgroundEnable(bool flag);
+    int boundX();
+    int boundY();
+    int boundWidth();
+    int boundHeight();
+    void setText(const QString & text);
+    QString text();
+    void setTextColor(const QColor &color);
+    QColor getTextColor();
+    void setBackgroundColor(const QColor &color);
+    QColor getBackgroundColor();
+    void setPress(bool b);
 
 signals:
 
