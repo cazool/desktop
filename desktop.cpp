@@ -39,6 +39,7 @@ void Desktop::setBackgroundColor(const QColor &color)
 void Desktop::setBackgroudImage(QString path)
 {
     m_panel->boundImageToRelease(path);
+    m_panel->boundImageToPress(path);
 }
 
 void Desktop::environment()
@@ -104,9 +105,11 @@ void Desktop::getDesktopFiles()
     }
     m_fileList.append("user-trash");
     m_fileNameList.append(tr("Trash"));
+    m_execNameList.append("hello");
 
     m_fileList.append("computer");
     m_fileNameList.append(tr("Computer"));
+    m_execNameList.append("hello");
 }
 
 QString Desktop::getIconFile(QString fileName)
