@@ -184,6 +184,12 @@ void DComponent::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     update();
 }
 
+void DComponent::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event);
+    emit doubleClicked();
+}
+
 void DComponent::keyPressEvent(QKeyEvent *event)
 {
     Q_UNUSED(event);
