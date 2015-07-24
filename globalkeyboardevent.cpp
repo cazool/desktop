@@ -9,7 +9,7 @@ void GlobalKeyboardEvent::run()
 {
     qDebug() << "thread is running";
     int fd = open(KEY_DEV,O_RDONLY);
-    int n;
+
 
     static struct input_event kbdData;
 

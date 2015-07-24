@@ -34,6 +34,8 @@ SetApp::~SetApp()
 
 void SetApp::setupUi(QWidget *SetApp)
 {
+    Q_UNUSED(SetApp);
+
     label_AppIcon = new QLabel(this);
     label_AppIcon->setObjectName(QString::fromUtf8("label_AppIcon"));
     label_AppIcon->setGeometry(QRect(10, 8, 60, 60));
@@ -162,6 +164,7 @@ void SetApp::mouseMoveEvent ( QMouseEvent * event )
 
 void SetApp::enterEvent ( QEvent * event )
 {
+    Q_UNUSED(event);
     label_AppName->setStyleSheet(QString::fromUtf8( appNameColorHover ));
 
 }
@@ -169,6 +172,7 @@ void SetApp::enterEvent ( QEvent * event )
 
 void SetApp::leaveEvent ( QEvent * event )
 {
+    Q_UNUSED(event);
     label_AppName->setStyleSheet(QString::fromUtf8( appNameColorDefault ));
 }
 
