@@ -26,6 +26,8 @@ public:
     QString parseDesktopFile(QString fileName, QString item);
 
     QString getIconFile(QString fileName);
+    
+    QString getExecutableFile(QString fileName);
 
     ~Desktop();
 private:
@@ -39,8 +41,10 @@ private:
     QStringList m_fileList;
     QGraphicsView *m_view;
     QStringList m_desktopLocation;
+    QStringList m_binaryPath;
     QStringList m_iconPathList;
     QStringList m_fileNameList;
+    QStringList m_execNameList;
     Panel *m_panel;
 };
 

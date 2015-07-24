@@ -94,6 +94,7 @@ public:
 signals:
 
     void clicked();
+    void doubleClicked();
 
 protected:
     void keyPressEvent(QKeyEvent *event);
@@ -103,6 +104,7 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event);
 
 private:
     int m_xOffset, m_yOffset;

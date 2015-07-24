@@ -10,9 +10,14 @@ class Icon : public DComponent
 
 public:
     Icon();
+    void setExecutablePath(QString path);
+    
 
 private:
-
+    QProcess *m_process;
+    QString m_executablePath;
+public slots:
+    void exec();
 protected:
 
 };

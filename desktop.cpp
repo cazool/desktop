@@ -46,6 +46,9 @@ void Desktop::environment()
     m_iconPathList.append("/usr/share/icons/flattr/apps/scalable/");
     m_iconPathList.append("/usr/share/pixmaps/");
     m_iconPathList.append("/usr/share/icons/hicolor/512x512/apps/");
+    
+    m_binaryPath.append("/usr/bin/");
+    m_binaryPath.append("/usr/local/bin/");
     m_desktopLocation = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
 }
 
@@ -86,6 +89,7 @@ void Desktop::getDesktopFiles()
             {
                 m_fileList.append(parseDesktopFile(QFileInfo(dirIt.filePath()).fileName(),"Icon"));
                 m_fileNameList.append(parseDesktopFile(QFileInfo(dirIt.filePath()).fileName(),"Name"));
+                m_execNameList.append(parseDesktopFile(QFileInfo(dirIt.filePath()).fileName(),"Exec"));
             }
         }
     }
@@ -109,6 +113,20 @@ QString Desktop::getIconFile(QString fileName)
         else if(QFileInfo(m_iconPathList.at(i)+fileName+".xpm").exists())
         {
             arg = m_iconPathList.at(i)+fileName+".xpm";
+            break;
+        }
+    }
+    return arg;
+}
+
+QString Desktop::getExecutableFile(QString fileName)
+{
+    QString arg;
+    for(int i=0;i<m_binaryPath.size();i++)
+    {
+        if(QFileInfo(m_binaryPath.at(i)+fileName).exists())
+        {
+            arg = m_binaryPath.at(i)+fileName;
             break;
         }
     }
@@ -141,6 +159,7 @@ void Desktop::createIcons()
         icon->boundImageToHover(filePath);
         icon->setImageScale(48,48);
         icon->setImageAlignment(DComponent::top);
+        icon->setExecutablePath(getExecutableFile(m_execNameList.at(i)));
         addIcon(icon);
     }
 }
