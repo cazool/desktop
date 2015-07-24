@@ -155,3 +155,105 @@ void DComponent::setDraggable(bool b)
     m_isDraggable = b;
 }
 
+void DComponent::setBounds(int x, int y, int w, int h)
+{
+    x_axis = x;
+    y_axis = y;
+    width = w;
+    height = h;
+}
+
+void DComponent::setPressBackgroundColor(const QColor &color)
+{
+    pressBackgroundColor = color;
+}
+
+void DComponent::setReleaseBackgroundColor(const QColor &color)
+{
+    releaseBackgroundColor = color;
+}
+
+void DComponent::setHoverBackgroundColor(const QColor &color)
+{
+    hoverBackgroundColor = color;
+}
+
+void DComponent::setHoverEnableFlag(bool flag)
+{
+     setAcceptHoverEvents(flag);
+}
+
+void DComponent::setAdjust(qreal value)
+{
+    adjust = value;
+}
+
+bool DComponent::isPressed()
+{
+    return pressed;
+}
+
+bool DComponent::isHovered()
+{
+    return hovered;
+}
+
+void DComponent::setBackgroundEnable(bool flag)
+{
+    backgroundEnabled = flag;
+}
+
+int DComponent::boundX()
+{
+    return x_axis;
+}
+
+int DComponent::boundY()
+{
+    return y_axis;
+}
+
+int DComponent::boundWidth()
+{
+    return width;
+}
+
+int DComponent::boundHeight()
+{
+    return height;
+}
+
+void DComponent::setText(const QString & text)
+{
+    textContent = text;
+}
+
+QString DComponent::text()
+{
+    return textContent;
+}
+
+void DComponent::setTextColor(const QColor &color)
+{
+    textColor = color;
+}
+
+QColor DComponent::getTextColor()
+{
+    return textColor;
+}
+
+void DComponent::setBackgroundColor(const QColor &color)
+{
+    backGroundColor = color;
+}
+
+QColor DComponent::getBackgroundColor()
+{
+    return backGroundColor;
+}
+
+void DComponent::setPress(bool b)
+{
+    pressed = b;
+}
