@@ -9,6 +9,7 @@ Desktop::Desktop(QObject *parent)
 
 Desktop::Desktop(QGraphicsView *view)
 {
+    XDebug();
     m_view = view;
     m_view->setWindowFlags(Qt::CustomizeWindowHint);
 
@@ -17,6 +18,7 @@ Desktop::Desktop(QGraphicsView *view)
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     getScreenDemension();
+    XDebug();
     setDesktopDemension();
     setBackgroundColor(QColor(255,255,255,255));
     environment();
@@ -43,6 +45,7 @@ void Desktop::setBackgroudImage(QString path)
 
 void Desktop::environment()
 {
+    qDebug();
     //todo: get skins to set icons path
     m_iconPathList.append("/usr/share/icons/hicolor/48x48/apps/");
     m_iconPathList.append("/usr/share/icons/flattr/apps/scalable/");
@@ -58,6 +61,7 @@ void Desktop::environment()
     
     m_binaryPath.append("/usr/bin/");
     m_binaryPath.append("/usr/local/bin/");
+
     m_desktopLocation = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
 }
 
@@ -104,9 +108,12 @@ void Desktop::getDesktopFiles()
     }
     m_fileList.append("user-trash");
     m_fileNameList.append(tr("Trash"));
+    m_execNameList.append("filemanager open trash");
+
 
     m_fileList.append("computer");
     m_fileNameList.append(tr("Computer"));
+    m_execNameList.append("filemanager open computer");
 }
 
 QString Desktop::getIconFile(QString fileName)
@@ -149,6 +156,7 @@ QString Desktop::getExecutableFile(QString fileName)
 
 void Desktop::createIcons()
 {
+    XDebug();
     m_panel = new Panel();
     m_panel->setPos(0, 0);
     m_panel->setBounds(-m_screenWidth/2,-m_screenHeight/2,m_screenWidth,m_screenHeight);
@@ -176,8 +184,9 @@ void Desktop::createIcons()
         icon->setImageAlignment(DComponent::top);
         icon->setExecutablePath(getExecutableFile(m_execNameList.at(i)));
         addIcon(icon);
+        XDebug();
     }
-
+XDebug();
 }
 
 //void Desktop::CreateTrashIcon()
