@@ -21,7 +21,7 @@ Desktop::Desktop(QGraphicsView *view)
     environment();
     getDesktopFiles();
     createIcons();
-    setBackgroudImage("/usr/share/backgrounds/desktop.jpg");
+    setBackgroudImage("../desktop/images/desktop.jpg");
     m_panel->setImageRatioMode(DComponent::KeepImageRatioByExpanding);
 }
 
