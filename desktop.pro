@@ -29,6 +29,8 @@ win32-g++ {
     DESTDIR = ../Desktop_win32
 }
 
+CONFIG+=c++11
+
 message("$$PLATFORM")
 
 MOC_DIR = .$${PLATFORM}_moc

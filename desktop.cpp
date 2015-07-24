@@ -11,6 +11,7 @@ Desktop::Desktop(QGraphicsView *view)
 {
     m_view = view;
     m_view->setWindowFlags(Qt::CustomizeWindowHint);
+
     m_view->setStyleSheet( "QGraphicsView { border-style: none; }" );
     m_view->showFullScreen();
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -21,7 +22,7 @@ Desktop::Desktop(QGraphicsView *view)
     environment();
     getDesktopFiles();
     createIcons();
-    setBackgroudImage("/usr/share/backgrounds/desktop.jpg");
+    setBackgroudImage("/usr/share/wallpapers/albatross-wall-source.svg");
     m_panel->setImageRatioMode(DComponent::KeepImageRatioByExpanding);
 }
 
@@ -42,10 +43,18 @@ void Desktop::setBackgroudImage(QString path)
 
 void Desktop::environment()
 {
+    //todo: get skins to set icons path
     m_iconPathList.append("/usr/share/icons/hicolor/48x48/apps/");
     m_iconPathList.append("/usr/share/icons/flattr/apps/scalable/");
     m_iconPathList.append("/usr/share/pixmaps/");
     m_iconPathList.append("/usr/share/icons/hicolor/512x512/apps/");
+    m_iconPathList.append("/usr/share/icons/oxygen/48x48/devices/");
+    m_iconPathList.append("/usr/share/icons/gnome/48x48/devices/");
+    m_iconPathList.append("/usr/share/icons/Adwaita/48x48/devices/");
+    m_iconPathList.append("/usr/share/icons/oxygen/48x48/places/");
+    m_iconPathList.append("/usr/share/icons/gnome/48x48/places/");
+    m_iconPathList.append("/usr/share/icons/Adwaita/48x48/places/");
+
     m_desktopLocation = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
 }
 
@@ -89,6 +98,11 @@ void Desktop::getDesktopFiles()
             }
         }
     }
+    m_fileList.append("user-trash");
+    m_fileNameList.append(tr("Trash"));
+
+    m_fileList.append("computer");
+    m_fileNameList.append(tr("Computer"));
 }
 
 QString Desktop::getIconFile(QString fileName)
@@ -122,6 +136,7 @@ void Desktop::createIcons()
     m_panel->setBounds(-m_screenWidth/2,-m_screenHeight/2,m_screenWidth,m_screenHeight);
     m_panel->setHoverEnableFlag(false);
     addItem(m_panel);
+
     for(int i=0;i<m_fileList.size();i++)
     {
         Icon *icon = new Icon();
@@ -143,7 +158,30 @@ void Desktop::createIcons()
         icon->setImageAlignment(DComponent::top);
         addIcon(icon);
     }
+
 }
+
+//void Desktop::CreateTrashIcon()
+//{
+//    Icon *icon = new Icon();
+//    icon->setPos(0, i*80);
+//    icon->setBounds(-40,-40,80,80);
+//    icon->setHoverEnableFlag(true);
+//    icon->setPressBackgroundEnable(true);
+//    icon->setHoverBackgroundEnable(true);
+//    icon->setPressBackgroundColor(QColor(0,0,0,100));
+//    icon->setHoverBackgroundColor(QColor(0,0,0,100));
+//    icon->setDraggable(true);
+
+//    QString filePath = getIconFile(m_fileList.at(i));
+//    icon->setText(m_fileNameList.at(i));
+//    icon->boundImageToPress(filePath);
+//    icon->boundImageToRelease(filePath);
+//    icon->boundImageToHover(filePath);
+//    icon->setImageScale(48,48);
+//    icon->setImageAlignment(DComponent::top);
+//    addIcon(icon);
+//}
 
 void Desktop::addIcon(Icon *icon)
 {
