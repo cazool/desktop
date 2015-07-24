@@ -11,6 +11,7 @@ Desktop::Desktop(QGraphicsView *view)
 {
     m_view = view;
     m_view->setWindowFlags(Qt::CustomizeWindowHint);
+    m_view->setStyleSheet( "QGraphicsView { border-style: none; }" );
     m_view->showFullScreen();
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -21,6 +22,7 @@ Desktop::Desktop(QGraphicsView *view)
     getDesktopFiles();
     createIcons();
     setBackgroudImage("/usr/share/backgrounds/desktop.jpg");
+    m_panel->setImageRatioMode(DComponent::KeepImageRatioByExpanding);
 }
 
 Desktop::~Desktop()
@@ -81,7 +83,10 @@ void Desktop::getDesktopFiles()
         if (QFileInfo(dirIt.filePath()).isFile())
         {
             if (QFileInfo(dirIt.filePath()).suffix() == "desktop")
+            {
                 m_fileList.append(parseDesktopFile(QFileInfo(dirIt.filePath()).fileName(),"Icon"));
+                m_fileNameList.append(parseDesktopFile(QFileInfo(dirIt.filePath()).fileName(),"Name"));
+            }
         }
     }
 }
@@ -116,7 +121,6 @@ void Desktop::createIcons()
     m_panel->setPos(0, 0);
     m_panel->setBounds(-m_screenWidth/2,-m_screenHeight/2,m_screenWidth,m_screenHeight);
     m_panel->setHoverEnableFlag(false);
-    m_panel->setBackgroundEnable(false);
     addItem(m_panel);
     for(int i=0;i<m_fileList.size();i++)
     {
@@ -124,14 +128,19 @@ void Desktop::createIcons()
         icon->setPos(0, i*80);
         icon->setBounds(-40,-40,80,80);
         icon->setHoverEnableFlag(true);
-        icon->setBackgroundEnable(true);
+        icon->setPressBackgroundEnable(true);
+        icon->setHoverBackgroundEnable(true);
+        icon->setPressBackgroundColor(QColor(0,0,0,100));
+        icon->setHoverBackgroundColor(QColor(0,0,0,100));
         icon->setDraggable(true);
-
+        
         QString filePath = getIconFile(m_fileList.at(i));
+        icon->setText(m_fileNameList.at(i));
         icon->boundImageToPress(filePath);
         icon->boundImageToRelease(filePath);
         icon->boundImageToHover(filePath);
-        qDebug()<<filePath;
+        icon->setImageScale(48,48);
+        icon->setImageAlignment(DComponent::top);
         addIcon(icon);
     }
 }

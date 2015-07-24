@@ -40,7 +40,7 @@ private:
     QGraphicsView *m_view;
     QStringList m_desktopLocation;
     QStringList m_iconPathList;
-
+    QStringList m_fileNameList;
     Panel *m_panel;
 };
 

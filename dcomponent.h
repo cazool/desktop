@@ -12,7 +12,27 @@ class DComponent :  public QObject, public QGraphicsItem
 
 public:
     DComponent();
-
+    
+    enum Alignment
+    {
+        center = 0,
+        left = 1,
+        right = 2,
+        top = 3,
+        bottom = 4,
+        topRight = 5,
+        topLeft = 6,
+        bottomLeft = 7,
+        bottomRight = 8
+    };
+    
+    enum ImageRatioMode
+    {
+        IgnoreImageRatio,
+        KeepImageRatio,
+        KeepImageRatioByExpanding
+    };
+    
     QRectF boundingRect() const;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -63,9 +83,13 @@ public:
     QString text();
     void setTextColor(const QColor &color);
     QColor getTextColor();
-    void setBackgroundColor(const QColor &color);
-    QColor getBackgroundColor();
     void setPress(bool b);
+    void setPressBackgroundEnable(bool b); 
+    void setReleaseBackgroundEnable(bool b);    
+    void setHoverBackgroundEnable(bool b);
+    void setImageRatioMode(ImageRatioMode mode);   
+    void setImageAlignment(Alignment align);
+    void setImageScale(int w, int h);
 
 signals:
 
@@ -84,7 +108,12 @@ private:
     int m_xOffset, m_yOffset;
     int m_xPos, m_yPos;
     int m_xPress, m_yPress;
+    int m_xOffsetImage, m_yOffsetImage;
+    
     bool m_isDraggable;
+    bool m_pressBackgroundEnabled;
+    bool m_releaseBackgroundEnabled;
+    bool m_hoverBackgroundEnabled;
 
 };
 

@@ -10,13 +10,17 @@ DComponent::DComponent()
     m_adjust = 0;
     m_xPos = 0;
     m_yPos = 0;
+    m_xOffsetImage = 0;
+    m_yOffsetImage = 0;
     setFlag(QGraphicsItem::ItemIsFocusable);
     setAcceptHoverEvents(false);
     setReleaseBackgroundColor(Qt::white);
     setPressBackgroundColor(QColor(238,232,205,255));
     setHoverBackgroundColor(QColor(238,232,205,255));
+    setPressBackgroundEnable(false);
+    setReleaseBackgroundEnable(false);
+    setHoverBackgroundEnable(false);
     setTextColor(Qt::black);
-    setBackgroundColor(QColor(255,255,255,255));
 }
 
 QRectF DComponent::boundingRect() const
@@ -33,37 +37,91 @@ void DComponent::paint(QPainter *painter,const QStyleOptionGraphicsItem *option,
     Q_UNUSED(widget);
     if(m_pressed)
     {
-        if(m_backgroundEnabled)
+        if(m_pressBackgroundEnabled)
         {
-            painter->setPen(m_pressBackgroundColor);
+            painter->setPen(QColor(0,0,0,0));
             painter->setBrush(m_pressBackgroundColor);
             painter->drawRect(m_x_axis, m_y_axis, m_width, m_height);
         }
-        painter->drawPixmap(-m_releaseImage.width()/2,-m_releaseImage.height()/2,
-                            m_releaseImage.width(),m_releaseImage.height(),m_pressImage);
-
+        painter->drawPixmap(-m_releaseImage.width()/2 + m_xOffsetImage,
+                            -m_releaseImage.height()/2 + m_yOffsetImage,
+                            m_releaseImage.width(),
+                            m_releaseImage.height(),
+                            m_pressImage);
+        
     }
     else if(m_hovered)
     {
-        if(m_backgroundEnabled)
+        if(m_hoverBackgroundEnabled)
         {
-            painter->setPen(m_hoverBackgroundColor);
             painter->setBrush(m_hoverBackgroundColor);
+            painter->setPen(QColor(0,0,0,0));
             painter->drawRect(m_x_axis, m_y_axis, m_width, m_height);
         }
-        painter->drawPixmap(-m_releaseImage.width()/2, -m_releaseImage.height()/2,
-                            m_releaseImage.width(), m_releaseImage.height(), m_hoverImage);
+        painter->drawPixmap(-m_releaseImage.width()/2 + m_xOffsetImage,
+                            -m_releaseImage.height()/2 + m_yOffsetImage,
+                            m_releaseImage.width(),
+                            m_releaseImage.height(),
+                            m_hoverImage);
     }
     else
     {
-        if(m_backgroundEnabled)
+        if(m_releaseBackgroundEnabled)
         {
-            painter->setPen(m_releaseBackgroundColor);
+            painter->setPen(QColor(0,0,0,0));
             painter->setBrush(m_releaseBackgroundColor);
             painter->drawRect(m_x_axis, m_y_axis, m_width, m_height);
         }
-        painter->drawPixmap(-m_releaseImage.width()/2,-m_releaseImage.height()/2,
-                            m_releaseImage.width(),m_releaseImage.height(),m_releaseImage);
+        painter->drawPixmap(-m_releaseImage.width()/2 + m_xOffsetImage,
+                            -m_releaseImage.height()/2 + m_yOffsetImage,
+                            m_releaseImage.width(),
+                            m_releaseImage.height(),
+                            m_releaseImage);
+    }
+    
+    if(!m_textContent.isNull())
+    {
+        painter->setPen(QColor(255,255,255,255));
+        painter->drawText(m_x_axis, m_y_axis+50,m_textContent);
+    }
+}
+
+void DComponent::setImageRatioMode(ImageRatioMode mode)
+{
+    switch(mode)
+    {
+    case IgnoreImageRatio:
+        if(!m_pressImage.isNull())
+            m_pressImage = m_pressImage.scaled(m_width, m_height, Qt::IgnoreAspectRatio);
+        
+        if(!m_releaseImage.isNull())
+            m_releaseImage = m_releaseImage.scaled(m_width, m_height, Qt::IgnoreAspectRatio);
+        
+        if(!m_hoverImage.isNull())
+            m_hoverImage = m_hoverImage.scaled(m_width, m_height, Qt::IgnoreAspectRatio);
+        break;
+    case KeepImageRatio:
+        if(!m_pressImage.isNull())
+            m_pressImage = m_pressImage.scaled(m_width, m_height, Qt::KeepAspectRatio);
+        
+        if(!m_releaseImage.isNull())
+            m_releaseImage = m_releaseImage.scaled(m_width, m_height, Qt::KeepAspectRatio);
+        
+        if(!m_hoverImage.isNull())
+            m_hoverImage = m_hoverImage.scaled(m_width, m_height, Qt::KeepAspectRatio);
+        break;
+    case KeepImageRatioByExpanding:
+        if(!m_pressImage.isNull())
+            m_pressImage = m_pressImage.scaled(m_width, m_height, Qt::KeepAspectRatioByExpanding);
+        
+        if(!m_releaseImage.isNull())
+            m_releaseImage = m_releaseImage.scaled(m_width, m_height, Qt::KeepAspectRatioByExpanding);
+        
+        if(!m_hoverImage.isNull())
+            m_hoverImage = m_hoverImage.scaled(m_width, m_height, Qt::KeepAspectRatioByExpanding);
+        break;
+     default:
+        break;
     }
 }
 
@@ -243,17 +301,78 @@ QColor DComponent::getTextColor()
     return m_textColor;
 }
 
-void DComponent::setBackgroundColor(const QColor &color)
-{
-    m_backGroundColor = color;
-}
-
-QColor DComponent::getBackgroundColor()
-{
-    return m_backGroundColor;
-}
-
 void DComponent::setPress(bool b)
 {
     m_pressed = b;
+}
+
+void DComponent::setPressBackgroundEnable(bool b)
+{
+    m_pressBackgroundEnabled = b;
+}
+
+void DComponent::setReleaseBackgroundEnable(bool b)
+{
+    m_releaseBackgroundEnabled = b;
+}
+
+void DComponent::setHoverBackgroundEnable(bool b)
+{
+    m_hoverBackgroundEnabled = b;
+}
+
+void DComponent::setImageAlignment(Alignment align)
+{
+    switch(align)
+    {
+    case center:
+        m_xOffsetImage = 0;
+        m_yOffsetImage = 0;
+        break;
+    case left:
+        m_xOffsetImage = -m_width/4;
+        m_yOffsetImage = 0;
+        break;
+    case right:
+        m_xOffsetImage = m_width/4;
+        m_yOffsetImage = 0;
+        break;
+    case top:
+        m_xOffsetImage = 0;
+        m_yOffsetImage = -m_height/4;
+        if(-m_releaseImage.height()/2 + m_yOffsetImage <= -m_height/2)
+            m_yOffsetImage = -m_height/2 + m_releaseImage.height()/2 + MARGIN_IMAGE_BOUND;
+        break;
+    case topLeft:
+        m_xOffsetImage = -m_width/4;
+        m_yOffsetImage = -m_height/4;
+        break;
+    case topRight:
+        m_xOffsetImage = m_width/4;
+        m_yOffsetImage = -m_height/4;
+        break;
+    case bottom:
+        m_xOffsetImage = 0;
+        m_yOffsetImage = m_height/4;
+        break;
+    case bottomLeft:
+        m_xOffsetImage = -m_width/4;
+        m_yOffsetImage = m_height/4;
+        break;
+    case bottomRight:
+        m_xOffsetImage = m_width/4;
+        m_yOffsetImage = -m_height/4;
+        break;
+    default:
+        m_xOffsetImage = 0;
+        m_yOffsetImage = 0;
+        break;
+    }
+}
+
+void DComponent::setImageScale(int w, int h)
+{
+    m_releaseImage = m_releaseImage.scaled(w, h, Qt::KeepAspectRatio);
+    m_hoverImage = m_hoverImage.scaled(w, h, Qt::KeepAspectRatio);
+    m_pressImage = m_pressImage.scaled(w, h, Qt::KeepAspectRatio);
 }
