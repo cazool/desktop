@@ -1,347 +1,148 @@
-#include <QStandardPaths>
 
 #include "desktop.h"
-#include "setapp.h"
 
-#include "ui_desktop.h"
-#include "globalkeyboardevent.h"
-
-
-
-
-Desktop::Desktop(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Desktop)
+Desktop::Desktop(QObject *parent)
+    : QGraphicsScene(parent)
 {
-    ui->setupUi(this);
 
+}
 
-    initDesktopWidget();
-
-    QTimer::singleShot(500, this, SLOT(initGlobelKeyboardEvent()));
-
+Desktop::Desktop(QGraphicsView *view)
+{
+    m_view = view;
+    m_view->setWindowFlags(Qt::CustomizeWindowHint);
+    m_view->showFullScreen();
+    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    getScreenDemension();
+    setDesktopDemension();
+    setBackgroundColor(QColor(255,255,255,255));
+    environment();
+    getDesktopFiles();
+    createIcons();
+    setBackgroudImage("/usr/share/backgrounds/desktop.jpg");
 }
 
 Desktop::~Desktop()
 {
-    delete ui;
-}
-
-void Desktop::initGlobelKeyboardEvent()
-{
-    GlobalKeyboardEvent *gloKbd = new GlobalKeyboardEvent();
-    connect(gloKbd,SIGNAL(escPressSignal()),this,SLOT(globelKeyboardEvent()));
-    gloKbd->start();
-}
-void Desktop::globelKeyboardEvent()
-{
-    qDebug() <<"esc press!";
 
 }
 
-void Desktop::initDesktopWidget()
+void Desktop::setBackgroundColor(const QColor &color)
 {
+    m_view->setBackgroundBrush(color);
+}
 
-    QString desktopPath = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation).at(0);
+void Desktop::setBackgroudImage(QString path)
+{
+    m_panel->boundImageToRelease(path);
+}
 
-    QDir appDir(desktopPath);
-    if (!appDir.exists())
-        qDebug() << "Cannot find the desktop directory";
+void Desktop::environment()
+{
+    m_iconPathList.append("/usr/share/icons/hicolor/48x48/apps/");
+    m_iconPathList.append("/usr/share/icons/flattr/apps/scalable/");
+    m_iconPathList.append("/usr/share/pixmaps/");
+    m_iconPathList.append("/usr/share/icons/hicolor/512x512/apps/");
+    m_desktopLocation = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
+}
 
-    int appCount = 0;
-    currentPage = 0;
-    appManagerStatus = false;
+QString Desktop::parseDesktopFile(QString fileName, QString item)
+{
+    QString name;
+    QSettings settings(m_desktopLocation.at(0)+"/"+fileName, QSettings::IniFormat);
+    settings.beginGroup("Desktop Entry");
+    name = settings.value(item).toString();
+    settings.endGroup();
+    return name;
+}
 
-    // 每行4个应用
-    // 最多4行
-    // 4行之后创建桌面的第二页
-    int appRow = 0;
-    int appCol = 0;
-    int size =   (appDir.entryInfoList().size() <= 16) ? appDir.entryInfoList().size() : 16;
-    int appPage = 0;
-    size = 17;
+void Desktop::getScreenDemension()
+{
+    QDesktopWidget widget;
+    QRect rec = widget.availableGeometry(widget.primaryScreen());
+    m_screenHeight = rec.height();
+    m_screenWidth = rec.width();
+    qDebug()<<m_screenHeight<<m_screenWidth;
+}
 
+void Desktop::setDesktopDemension()
+{
+    setSceneRect(-m_screenWidth/2,-m_screenHeight/2,m_screenWidth,m_screenHeight);
+    m_view->resize(m_screenWidth,m_screenHeight);
+}
 
-    // todo: cashed;
-
-    for( int i = 0; appCount < size; i++)
+void Desktop::getDesktopFiles()
+{
+    QDirIterator dirIt(m_desktopLocation.at(0),QDirIterator::Subdirectories);
+    while (dirIt.hasNext())
     {
-
-        qDebug() <<"for out";
-        if ( appDir.entryInfoList().at(i).isDir())
-            if( appDir.entryInfoList().at(i).fileName().left(3) == QString(".desktop")
-                    && appDir.entryInfoList().at(i).fileName().size() >= 4)
-            {
-                qDebug() <<"for";
-
-                if(appCount != 0 && (appCount%16) == 0)
-                {
-                    qDebug() << "appCount" <<appCount
-                             <<"appCount%16" <<appCount%16;
-                    appPage++;
-                    appRow = 0;
-                    qDebug() << "16 +1" <<this->width();
-                    qDebug() << appDir.entryInfoList().at(i).fileName();
-                }
-
-
-                SetApp *app = new SetApp(this);
-                app->setAppDirName( appDir.entryInfoList().at(i).fileName() );
-                app->setGeometry(appCol*(80+32)+32 + (appPage*480),appRow*(90+24)+24,80,90);
-
-                qDebug() << appDir.entryInfoList().at(i).fileName()
-                         << "appCount"<<appCount
-                         << "appCol" <<appCol
-                         << "appRow" <<appRow;
-                /**/
-                connect(app,SIGNAL(showDesktopSignal()),this,SLOT(show()));
-                connect(app,SIGNAL(appExecSignal()),this,SLOT(hide()));
-                connect(app,SIGNAL(appManagerSignal()),this,SLOT(startAppManager()));
-                connect(app,SIGNAL(appMoveSignal(int)),this,SLOT(moveAppIcon(int)));
-                appCount++;
-                appCol++;
-
-                if (appCol == 4)
-                {
-                    appCol = 0;
-                    appRow++;
-                }
-
-                // add to app list
-                appList.append(app);
-
-                // appclass must design a appprocess interface
-                //desktop visti
-            }
-    }
-
-    qDebug() << "setup page 1";
-    //page tips label
-    label_Page = new QLabel(this);
-    label_Page->setObjectName(QString::fromUtf8("label_Page"));
-    label_Page->setGeometry(QRect(0, 500, 480, 16));
-    label_Page->setAlignment(Qt::AlignHCenter);
-    label_Page->setText(QString::number(currentPage));
-    label_Page->setStyleSheet("color:white");
-
-    //page 0 search label
-    qDebug() <<"this width" << this->width();
-    QLabel* label_Search;
-    label_Search = new QLabel(this);
-    label_Search->setObjectName(QString::fromUtf8("label_Search"));
-    label_Search->setGeometry(QRect(-480+10, 40, 60, 30));
-    label_Search->setAlignment(Qt::AlignHCenter);
-    label_Search->setText(QString::fromUtf8("Search"));
-    label_Search->setStyleSheet("font :bold; color:white");
-
-    QLineEdit *lineEdit_Search;
-    lineEdit_Search = new QLineEdit(this);
-    lineEdit_Search->setObjectName(QString::fromUtf8("lineEdit_Search"));
-    lineEdit_Search->setGeometry(QRect(-480+70,32, 400, 30));
-    lineEdit_Search->setStyleSheet("font :bold; color:white");
-
-    desktopWidgetList << label_Search
-                         <<lineEdit_Search;
-}
-
-
-void Desktop::startAppManager()
-{
-    qDebug() << "desktop manager";
-    appManagerStatus = true;
-    for(int i = 0; i < appList.size(); i++)
-    {
-        appList.at(i)->startAppManagerStatus();
-    }
-
-}
-void Desktop::stopAppManager()
-{
-
-    qDebug() << "desktop manager";
-    if(appManagerStatus == true)
-    {
-        for(int i = 0; i < appList.size(); i++)
+        dirIt.next();
+        if (QFileInfo(dirIt.filePath()).isFile())
         {
-            appList.at(i)->stopAppManagerStatus();
-        }
-        appManagerStatus = false;
-    }
-
-}
-void Desktop::moveAppIcon(int x)
-{
-
-    for(int i = 0; i < appList.size(); i++)
-    {
-        appList.at(i)->move(appList.at(i)->x()+x,appList.at(i)->y());
-    }
-
-    for(int i = 0;i < desktopWidgetList.size(); i++)
-    {
-        desktopWidgetList.at(i)->move(desktopWidgetList.at(i)->x()+x,
-                                      desktopWidgetList.at(i)->y());
-    }
-
-
-}
-void Desktop::keyPressEvent ( QKeyEvent * event )
-{
-    switch(event->key())
-    {
-    case Qt::Key_Escape:
-        stopAppManager();
-        break;
-
-    default:
-        break;
-    }
-
-}
-
-void Desktop::mouseMoveEvent ( QMouseEvent * event )
-{
-    int x = event->x() - mouseOldPosX;
-
-    moveAppIcon(x);
-    movingDistance += x;
-    mouseOldPosX = event->x();
-//    if(movingDistance >= 200)
-//    {
-//        automaticPageStatus = true;
-//    }
-}
-
-void Desktop::mousePressEvent ( QMouseEvent * event )
-{
-    movingDistance = 0;
-    mouseOldPosX = event->x();
-    desktopPosFlag = event->x();
-   // automaticPageStatus = false;
-}
-
-void Desktop::mouseReleaseEvent ( QMouseEvent * event )
-{
-    qDebug() << "mouseOldPosX" <<mouseOldPosX
-             <<"movingDistance"<<movingDistance
-             << "desktopPosFlag"<<desktopPosFlag;
-    //480/2 = 240
-    pageDirection = 0;
-    if (movingDistance > 200)
-    {
-        pageDirection = 1;
-    }
-    else if (movingDistance < (-200))
-    {
-        pageDirection = -1;
-    }
-    automaticPage(pageDirection);
-}
-
-void Desktop::automaticPage(int direction)
-{
-    qDebug()<<"direction"<<direction;
-    switch(direction)
-    {
-    case 1:
-        previousPage();
-        break;
-    case -1:
-        nextPage();
-        break;
-    case 0:
-        returnCurrentPage();
-        break;
-    default:
-        break;
-
-    }
-
-}
-
-void Desktop::returnCurrentPage()
-{
-
-    qDebug() << "returnCurrentPage" << movingDistance;
-    int tmp = movingDistance;
-    qDebug() <<"tmp" << tmp;
-    if(tmp == 0)
-        return;
-
-    if(tmp > 0)
-    {
-        for(int i = 0;i < tmp;i++)
-        {
-            moveAppIcon(-1);
-        }
-    }else{
-        for(int i = 0;i > tmp;i--)
-        {
-            moveAppIcon(1);
+            if (QFileInfo(dirIt.filePath()).suffix() == "desktop")
+                m_fileList.append(parseDesktopFile(QFileInfo(dirIt.filePath()).fileName(),"Icon"));
         }
     }
 }
-void Desktop::checkMoveAppIcon()
+
+QString Desktop::getIconFile(QString fileName)
 {
-
-}
-void Desktop::previousPage()
-{
-    currentPage--;
-    qDebug() << "currentPage" <<currentPage;
-
-    //x == 32+480
-    //x = 512
-
-    if (appList.size() > 0)
+    QString arg;
+    for(int i=0;i<m_iconPathList.size();i++)
     {
-        int tmp = appList.first()->x() + ((currentPage * 480)-32);
-
-        if(tmp == 0)
-            return;
-
-        if(tmp > 0)
+        if(QFileInfo(m_iconPathList.at(i)+fileName+".png").exists())
         {
-            for(int i = 0;i < tmp;i++)
-            {
-                moveAppIcon(-1);
-            }
-        }else{
-            for(int i = 0;i > tmp;i--)
-            {
-                moveAppIcon(1);
-            }
+            arg = m_iconPathList.at(i)+fileName+".png";
+            break;
+        }
+        else if(QFileInfo(m_iconPathList.at(i)+fileName+".svg").exists())
+        {
+            arg = m_iconPathList.at(i)+fileName+".svg";
+            break;
+        }
+        else if(QFileInfo(m_iconPathList.at(i)+fileName+".xpm").exists())
+        {
+            arg = m_iconPathList.at(i)+fileName+".xpm";
+            break;
         }
     }
-    label_Page->setText(QString::number(currentPage));
+    return arg;
 }
 
-void Desktop::nextPage()
+void Desktop::createIcons()
 {
-    currentPage++;
-    qDebug() <<"currentPage" <<currentPage << appList.first()->x();
-
-    if (appList.size() > 0)
+    m_panel = new Panel();
+    m_panel->setPos(0, 0);
+    m_panel->setBounds(-m_screenWidth/2,-m_screenHeight/2,m_screenWidth,m_screenHeight);
+    m_panel->setHoverEnableFlag(false);
+    m_panel->setBackgroundEnable(false);
+    addItem(m_panel);
+    for(int i=0;i<m_fileList.size();i++)
     {
-        int tmp = appList.first()->x() + ((currentPage * 480)-32);
+        Icon *icon = new Icon();
+        icon->setPos(0, i*80);
+        icon->setBounds(-40,-40,80,80);
+        icon->setHoverEnableFlag(true);
+        icon->setBackgroundEnable(true);
+        icon->setDraggable(true);
 
-        if(tmp == 0)
-            return;
-
-        if(tmp > 0)
-        {
-            for(int i = 0;i < tmp;i++)
-            {
-                moveAppIcon(-1);
-            }
-        }else{
-            for(int i = 0;i > tmp;i--)
-            {
-                moveAppIcon(1);
-            }
-        }
+        QString filePath = getIconFile(m_fileList.at(i));
+        icon->boundImageToPress(filePath);
+        icon->boundImageToRelease(filePath);
+        icon->boundImageToHover(filePath);
+        qDebug()<<filePath;
+        addIcon(icon);
     }
+}
 
-    qDebug() << "appList.first()->x()" <<appList.first()->x();
-    label_Page->setText(QString::number(currentPage));
+void Desktop::addIcon(Icon *icon)
+{
+    this->addItem(icon);
+}
+
+void Desktop::showScene()
+{
+    m_view->setScene(this);
+    m_view->show();
 }

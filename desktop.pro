@@ -14,7 +14,6 @@ QT       += core opengl widgets
 TARGET = desktop
 TEMPLATE = app
 
-
 linux-g++ {
     PLATFORM = x86
     QMAKE_CFLAGS += -pg
@@ -41,18 +40,22 @@ SOURCES += main.cpp\
     desktop.cpp \
     globalkeyboardevent.cpp \
     setapp.cpp \
-    sysenv.cpp
+    sysenv.cpp \
+    icon.cpp \
+    dcomponent.cpp \
+    panel.cpp
 
 HEADERS  += \
     common.h \
     desktop.h \
     globalkeyboardevent.h \
     setapp.h \
-    sysenv.h
+    sysenv.h \
+    icon.h \
+    dcomponent.h \
+    panel.h
 
-FORMS    += \
-    desktop.ui \
-    test.ui
+FORMS    +=
 
 OTHER_FILES += \
     README.txt

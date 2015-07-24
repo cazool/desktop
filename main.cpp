@@ -9,8 +9,10 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    Desktop d;
-    d.show();
+    QGraphicsView view;
+
+    Desktop *desktop = new Desktop(&view);
+    desktop->showScene();
 
     return a.exec();
 }

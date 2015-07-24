@@ -2,63 +2,46 @@
 #define DESKTOP_H
 
 #include "common.h"
+#include "icon.h"
+#include "panel.h"
 
-
-namespace Ui {
-class Desktop;
-}
-
-
-class SetApp;
-class GlobalKeyboardEvent;
-
-class Desktop : public QWidget
+class Desktop : public QGraphicsScene
 {
     Q_OBJECT
-    
 public:
-    explicit Desktop(QWidget *parent = 0);
+    explicit Desktop(QObject *parent = 0);
+
+    Desktop(QGraphicsView *view);
+
+    void showScene();
+
+    void addIcon(Icon *icon);
+
+    void addGridLayout();
+
+    void setBackgroundColor(const QColor &color);
+
+    void setBackgroudImage(QString path);
+
+    QString parseDesktopFile(QString fileName, QString item);
+
+    QString getIconFile(QString fileName);
+
     ~Desktop();
-
-public slots:
-    void globelKeyboardEvent();
-
-protected:
-    void keyPressEvent ( QKeyEvent * event );
-    void mouseMoveEvent ( QMouseEvent * event );
-    void mousePressEvent ( QMouseEvent * event );
-    void mouseReleaseEvent ( QMouseEvent * event );
-
-private slots:
-    void startAppManager();
-    void moveAppIcon(int x);
-    void checkMoveAppIcon();
-
-    void initGlobelKeyboardEvent();
-
 private:
-    Ui::Desktop *ui;
-    QLabel *label_Page;
-    QList< SetApp *> appList;
-    QList< QWidget *> desktopWidgetList;
-    QTimer *appIconMovetimer;
-    int mouseOldPosX;
-    int desktopPosFlag;
-    int movingDistance;
-    int pageDirection;
-    int appMoveFlag;
-    int pageCenterPosX;
-    int currentPage;
-    bool automaticPageStatus;
-    bool appManagerStatus;
+    void environment();
+    void createIcons();
+    void getDesktopFiles();
+    void getScreenDemension();
+    void setDesktopDemension();
 
-    void stopAppManager();
-    void initDesktopWidget();
-    void automaticPage(int direction);
-    void previousPage();
-    void nextPage();
-    void returnCurrentPage();
+    int m_screenWidth, m_screenHeight;
+    QStringList m_fileList;
+    QGraphicsView *m_view;
+    QStringList m_desktopLocation;
+    QStringList m_iconPathList;
 
+    Panel *m_panel;
 };
 
 #endif // DESKTOP_H
