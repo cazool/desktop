@@ -4,7 +4,7 @@
 
 #include "dcomponent.h"
 
-#define ComputerPath"computer://"
+#define ComputerPath "computer://"
 #define TrashPath "trash://"
 
 
